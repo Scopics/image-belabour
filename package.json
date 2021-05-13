@@ -1,7 +1,7 @@
 {
-  "name": "node-runtime-server",
-  "version": "1.0.0",
-  "description": "A server running javascript code that supports most of the standard nodejs libraries.",
+  "name": "image-belabour",
+  "version": "0.0.1",
+  "description": "Project for processing images by transform RGB function with NodeJS.",
   "main": "server.js",
   "scripts": {
     "lint": "eslint . && prettier -c \"**/*.js\" \"**/*.json\" \"**/*.md\"",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Scopics/node-runtime-server.git"
+    "url": "git+https://github.com/Scopics/image-belabour.git"
   },
   "keywords": [
     "nodejs",
@@ -19,9 +19,9 @@
   "author": "Scopics",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Scopics/node-runtime-server/issues"
+    "url": "https://github.com/Scopics/image-belabour/issues"
   },
-  "homepage": "https://github.com/Scopics/node-runtime-server#readme",
+  "homepage": "https://github.com/Scopics/image-belabour#readme",
   "dependencies": {},
   "devDependencies": {
     "eslint": "^7.25.0",
