@@ -7,28 +7,14 @@ const jimp = require('jimp');
 
 const filename = process.argv[2];
 const fullPath = path.resolve(__dirname, filename);
-const cpuCount = 1;
+const cpuCount = 2;
 const workers = [];
-const results = [];
 
 for (let i = 0; i < cpuCount; i++) {
   const worker = cp.fork('./lib/worker.js');
   console.log('Started worker:', worker.pid);
   workers.push(worker);
 }
-
-workers.forEach((worker) => {
-  worker.on('message', message => {
-
-    console.log('Message from worker', worker.pid);
-
-    results.push(message.data)
-    if (results.length === cpuCount) {
-      console.log(results);
-      process.exit(0);
-    }
-  });
-});
 
 const get = (src, cb) => {
   jimp.read(src).then((img) => {
@@ -42,17 +28,41 @@ const get = (src, cb) => {
 
 get(fullPath, (err, imageData) => {
   if (err) throw err;
-  
   console.log(imageData.data);
-  const data = v8.serialize(imageData.data);
-  workers.forEach((worker) => {
-    worker.send(data);
-  })
+  balancer(imageData, cpuCount).then((data) => {
+    console.log(data);
+    process.exit(0);
+  });
 });
 
 const balancer = (imageData, countWorkers) => {
-  const { data, width, height } = imageData;
-  const blockSize = Math.floor(data.length / countWorkers);
+  const results = new Array(countWorkers);
+  const { data } = imageData;
+  const len = data.length;
+  const size = Math.floor(len / countWorkers);
+  const tasks = [];
+  for (let i = 0; i < countWorkers; i++) {
+    tasks[i] = Buffer.from(data.slice(i * size, i * size + size));
+  }
 
-  
-}
+  let finished = 0;
+
+  return new Promise((resolve) => {
+    for (let i = 0; i < countWorkers; i++) {
+      workers[i].on('message', (message) => {
+        const { buffer, workerId } = message;
+        results[workerId] = buffer.data;
+
+        finished++;
+        if (finished === countWorkers) {
+          resolve(results);
+        }
+      });
+
+      workers[i].send({
+        buffer: tasks[i],
+        workerId: i,
+      });
+    }
+  });
+};

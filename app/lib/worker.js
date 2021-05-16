@@ -1,17 +1,18 @@
 'use strict';
 
 const transform = require('./transform');
-const v8 = require('v8');
 
 console.log('Run worker', process.pid);
 
-process.on('message', message => {
-  if (message.type === 'Buffer') console.log('Good');
+process.on('message', (message) => {
+  const { buffer, workerId } = message;
 
-  const { data }= message;
-  console.log( data.length )
+  if (buffer.type !== 'Buffer') {
+    throw new Error('Invalid data type');
+  }
+  const data = new Uint8ClampedArray(buffer.data);
   const result = transform(data);
 
-  const resultSerealized = v8.serialize(new Uint8ClampedArray(result));
-  process.send(resultSerealized);
+  const bufferRes = Buffer.from(result);
+  process.send({ buffer: bufferRes, workerId });
 });
