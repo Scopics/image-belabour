@@ -40,6 +40,7 @@ cacheFolder(transformFilesPath);
 
 const server = http.createServer(async (req, res) => {
   const url = req.url;
+  console.log(url);
   const urlSplitted = url.slice(1).split('/');
   const isApi = urlSplitted[0] === 'api';
   if (isApi) {
@@ -50,7 +51,6 @@ const server = http.createServer(async (req, res) => {
       res.end('Unknown method');
       return;
     }
-
   } else {
     const isMethod = methods.includes(url.slice(1));
     const file = isMethod ? './static/index.html' : path.join('./static', url);
