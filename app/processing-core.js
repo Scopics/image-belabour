@@ -61,7 +61,7 @@ const balancer = (imageData, countWorkers) => {
       workers[i].send({
         buffer: tasks[i],
         workerId: i,
-        method: './transform'
+        method: 'transform.js',
       });
     }
   });
