@@ -1,0 +1,29 @@
+'use strict';
+
+const defaultImgElement = document.getElementById('file-img');
+const fileElement = document.getElementById('file');
+const generateBtn = document.getElementById('generate');
+let imageData;
+
+defaultImgElement.onload = function () {
+  const canvas = document.createElement('canvas');
+  canvas.width = defaultImgElement.width;
+  canvas.height = defaultImgElement.height;
+  const context = canvas.getContext('2d');
+  context.drawImage(defaultImgElement, 0, 0);
+
+  const { width, height } = defaultImgElement;
+  imageData = context.getImageData(0, 0, width, height);
+  generateBtn.disabled = false;
+};
+
+const reader = new FileReader();
+reader.onload = function (e) {
+  const dataURL = e.target.result;
+  defaultImgElement.src = dataURL;
+}
+
+fileElement.addEventListener('change', e => {
+  const file = fileElement.files[0];
+  reader.readAsDataURL(file);
+})
