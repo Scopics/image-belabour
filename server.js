@@ -25,7 +25,7 @@ const cacheFile = (directory, name) => {
   const filePath = path.resolve(__dirname, directory + name);
   const method = name.split('.')[0];
   try {
-    const func =  require(filePath);
+    const func = require(filePath);
     api.set(method, func);
     methods = Array.from(api.keys());
   } catch (e) {
@@ -37,21 +37,21 @@ function cacheFolder(directory) {
   const cacheFilePath = cacheFile.bind(null, directory);
   fs.readdir(directory, (err, files) => {
     files.forEach(cacheFilePath);
-  })
+  });
 }
 
- async function getArgs(req) {
+async function getArgs(req) {
   return new Promise((resolve, reject) => {
     const chuncks = [];
-    req.on('data', chunck => {
+    req.on('data', (chunck) => {
       chuncks.push(chunck);
-    })
+    });
     req.on('end', () => {
       const args = JSON.parse(chuncks.join(''));
       resolve(args);
-    })
-  })
- }
+    });
+  });
+}
 
 cacheFolder(transformFilesPath);
 
@@ -92,8 +92,8 @@ const server = http.createServer(async (req, res) => {
         }
         res.writeHead(200, { 'Content-Type': mimeType });
         res.end(data);
-      })
-    } catch(e) {
+      });
+    } catch (e) {
       res.statusCode = 500;
       res.end('Unknown method');
       return;

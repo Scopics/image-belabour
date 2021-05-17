@@ -25,12 +25,12 @@ const reader = new FileReader();
 reader.onload = function (e) {
   const dataURL = e.target.result;
   defaultImgElement.src = dataURL;
-}
+};
 
-fileElement.addEventListener('change', e => {
+fileElement.addEventListener('change', (e) => {
   const file = fileElement.files[0];
   reader.readAsDataURL(file);
-})
+});
 
 function imageDataToImg(data) {
   const canvas = document.createElement('canvas');
