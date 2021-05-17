@@ -1,1 +1,1 @@
-const generateBtn = document.getElementById('generate');
+const url = window.location.pathname;
