@@ -1,11 +1,14 @@
 'use strict';
 
-const transform = require('./transform');
+const path = require('path');
 
 console.log('Run worker', process.pid);
 
 process.on('message', (message) => {
-  const { buffer, workerId } = message;
+  const { buffer, workerId, method } = message;
+
+  const methodPath = path.resolve(__dirname, method);
+  const transform = require(methodPath);
 
   if (buffer.type !== 'Buffer') {
     throw new Error('Invalid data type');
