@@ -1,40 +1,18 @@
 'use strict';
 
-const path = require('path');
 const cp = require('child_process');
-const jimp = require('jimp');
 
-const filename = process.argv[2];
-const fullPath = path.resolve(__dirname, filename);
-const cpuCount = 2;
-const workers = [];
+const workers = new Array();
 
-for (let i = 0; i < cpuCount; i++) {
-  const worker = cp.fork('./lib/worker.js');
-  console.log('Started worker:', worker.pid);
-  workers.push(worker);
-}
-
-const get = (src, cb) => {
-  jimp.read(src).then((img) => {
-    cb(null, {
-      data: new Uint8ClampedArray(img.bitmap.data),
-      height: img.bitmap.height,
-      width: img.bitmap.width,
-    });
-  }, cb);
+const runner = (countWorkers) => {
+  for (let i = 0; i < countWorkers; i++) {
+    const worker = cp.fork('./lib/worker.js');
+    console.log('Started worker:', worker.pid);
+    workers.push(worker);
+  }
 };
 
-get(fullPath, (err, imageData) => {
-  if (err) throw err;
-  console.log(imageData.data);
-  balancer(imageData, cpuCount).then((data) => {
-    console.log(data);
-    process.exit(0);
-  });
-});
-
-const balancer = (imageData, countWorkers) => {
+const balancer = (imageData, countWorkers, method) => {
   const results = new Array(countWorkers);
   const { data } = imageData;
   const len = data.length;
@@ -61,8 +39,13 @@ const balancer = (imageData, countWorkers) => {
       workers[i].send({
         buffer: tasks[i],
         workerId: i,
-        method: 'transform.js',
+        method,
       });
     }
   });
+};
+
+module.exports = {
+  runner,
+  balancer,
 };

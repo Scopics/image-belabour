@@ -1,7 +1,6 @@
 'use strict';
 
 const path = require('path');
-const transformMethods = new Map();
 
 console.log('Run worker', process.pid);
 
