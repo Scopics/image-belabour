@@ -7,7 +7,7 @@ console.log('Run worker', process.pid);
 process.on('message', (message) => {
   const { buffer, workerId, method } = message;
 
-  const methodPath = path.resolve(__dirname, method);
+  const methodPath = path.resolve(__dirname, '../transform', `${method}.js`);
   const transform = require(methodPath);
 
   if (buffer.type !== 'Buffer') {

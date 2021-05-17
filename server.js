@@ -3,6 +3,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+const processingCore = require('./app/processing-core');
 
 const MIME_TYPES = {
   html: 'text/html; charset=UTF-8',
@@ -13,6 +15,8 @@ const MIME_TYPES = {
   svg: 'image/svg+xml',
 };
 
+const PORT = 8000;
+const count = os.cpus().length;
 const transformFilesPath = './app/transform/';
 const api = new Map();
 let methods;
@@ -65,6 +69,10 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     const args = await getArgs(req);
+    const imageData = args.data;
+    const params = [imageData, count, urlMethod];
+    const processedImage = await processingCore.balancer(...params);
+    res.end(JSON.stringify(processedImage));
   } else {
     const isMethod = methods.includes(url.slice(1));
     const file = isMethod ? './static/index.html' : path.join('./static', url);
@@ -93,4 +101,5 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(8000);
+processingCore.runner(count);
+server.listen(PORT);

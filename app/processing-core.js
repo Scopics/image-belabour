@@ -6,15 +6,14 @@ const workers = new Array();
 
 const runner = (countWorkers) => {
   for (let i = 0; i < countWorkers; i++) {
-    const worker = cp.fork('./lib/worker.js');
+    const worker = cp.fork('./app/lib/worker.js');
     console.log('Started worker:', worker.pid);
     workers.push(worker);
   }
 };
 
-const balancer = (imageData, countWorkers, method) => {
+const balancer = (data, countWorkers, method) => {
   const results = new Array(countWorkers);
-  const { data } = imageData;
   const len = data.length;
   const size = Math.floor(len / countWorkers);
   const tasks = [];
