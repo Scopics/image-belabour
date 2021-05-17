@@ -2,7 +2,6 @@
 
 const path = require('path');
 const cp = require('child_process');
-const v8 = require('v8');
 const jimp = require('jimp');
 
 const filename = process.argv[2];
