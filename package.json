@@ -1,7 +1,7 @@
 {
   "name": "image-belabour",
   "version": "0.0.1",
-  "description": "Project for processing images by transform RGB function with NodeJS.",
+  "description": "Project for processing images by transform RGBA function with NodeJS.",
   "main": "server.js",
   "scripts": {
     "lint": "eslint . && prettier -c \"**/*.js\" \"**/*.json\" \"**/*.md\"",
