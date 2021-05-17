@@ -36,6 +36,19 @@ function cacheFolder(directory) {
   })
 }
 
+ async function getArgs(req) {
+  return new Promise((resolve, reject) => {
+    const chuncks = [];
+    req.on('data', chunck => {
+      chuncks.push(chunck);
+    })
+    req.on('end', () => {
+      const args = JSON.parse(chuncks.join(''));
+      resolve(args);
+    })
+  })
+ }
+
 cacheFolder(transformFilesPath);
 
 const server = http.createServer(async (req, res) => {
@@ -51,6 +64,7 @@ const server = http.createServer(async (req, res) => {
       res.end('Unknown method');
       return;
     }
+    const args = await getArgs(req);
   } else {
     const isMethod = methods.includes(url.slice(1));
     const file = isMethod ? './static/index.html' : path.join('./static', url);
