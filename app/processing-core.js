@@ -1,14 +1,12 @@
 'use strict';
 
 const cp = require('child_process');
-const util = require('util');
-const forkPromisified = util.promisify(cp.fork);
 
 const workers = new Array();
 
 const runner = async (countWorkers) => {
   for (let i = 0; i < countWorkers; i++) {
-    const worker = await forkPromisified('./app/lib/worker.js');
+    const worker = cp.fork('./app/lib/worker.js');
     console.log('Started worker:', worker.pid);
     workers.push(worker);
   }
@@ -26,19 +24,27 @@ const balancer = (data, countWorkers, method) => {
   let finished = 0;
 
   return new Promise((resolve, reject) => {
+    const onError = (err) => reject(err);
+
+    const onMessage = (message) => {
+      const { exportRes, workerId } = message;
+      results[workerId] = exportRes;
+
+      finished++;
+      if (finished === countWorkers) {
+        workers.forEach((worker) => {
+          console.log('yes');
+          worker.removeListener('message', onMessage);
+          worker.removeListener('error', onError);
+        });
+        resolve(results);
+      }
+    };
+
     for (let i = 0; i < countWorkers; i++) {
       const worker = workers[i];
-      worker.on('message', (message) => {
-        const { exportRes, workerId } = message;
-        results[workerId] = exportRes;
-
-        finished++;
-        if (finished === countWorkers) {
-          resolve(results);
-        }
-      });
-
-      worker.on('error', (err) => reject(err));
+      worker.on('message', onMessage);
+      worker.on('error', onError);
 
       worker.send({
         task: tasks[i],
