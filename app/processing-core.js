@@ -25,7 +25,7 @@ const balancer = (data, countWorkers, method) => {
 
   let finished = 0;
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     for (let i = 0; i < countWorkers; i++) {
       workers[i].on('message', (message) => {
         const { exportRes, workerId } = message;
@@ -36,6 +36,8 @@ const balancer = (data, countWorkers, method) => {
           resolve(results);
         }
       });
+
+      workers[i].on('error', (err) => reject(err));
 
       workers[i].send({
         task: tasks[i],
