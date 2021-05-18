@@ -53,6 +53,11 @@ async function getArgs(req) {
   });
 }
 
+function sendError(res) {
+  res.statusCode = 500;
+  res.end('Unknown method');
+}
+
 cacheFolder(transformFilesPath);
 
 const server = http.createServer(async (req, res) => {
@@ -64,8 +69,7 @@ const server = http.createServer(async (req, res) => {
     const urlMethod = urlSplitted[1];
     const method = api.get(urlMethod);
     if (!method) {
-      res.statusCode = 500;
-      res.end('Unknown method');
+      sendError(res);
       return;
     }
     const args = await getArgs(req);
@@ -78,24 +82,21 @@ const server = http.createServer(async (req, res) => {
     const file = isMethod ? './static/index.html' : path.join('./static', url);
     const fileExt = path.extname(file).slice(1);
     if (!fileExt) {
-      res.statusCode = 500;
-      res.end('Unknown method');
+      sendError(res);
       return;
     }
     const mimeType = MIME_TYPES[fileExt];
     try {
       fs.readFile(file, (err, data) => {
         if (err) {
-          res.statusCode = 500;
-          res.end('Unknown method');
+          sendError(res);
           return;
         }
         res.writeHead(200, { 'Content-Type': mimeType });
         res.end(data);
       });
     } catch (e) {
-      res.statusCode = 500;
-      res.end('Unknown method');
+      sendError(res);
       return;
     }
   }
