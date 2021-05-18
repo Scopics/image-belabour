@@ -2,18 +2,10 @@
 
 const http = require('http');
 const fs = require('fs');
-const path = require('path');
 const os = require('os');
+const path = require('path');
 const processingCore = require('./app/processing-core');
-
-const MIME_TYPES = {
-  html: 'text/html; charset=UTF-8',
-  js: 'application/javascript; charset=UTF-8',
-  css: 'text/css',
-  png: 'image/png',
-  ico: 'image/x-icon',
-  svg: 'image/svg+xml',
-};
+const MIME_TYPES = require('./MIME_TYPES.json')
 
 const PORT = 8000;
 const count = os.cpus().length;
@@ -22,7 +14,7 @@ const api = new Map();
 let methods;
 
 const cacheFile = (directory, name) => {
-  const filePath = path.resolve(__dirname, directory + name);
+  const filePath = path.join(__dirname, directory + name);
   const method = name.split('.')[0];
   try {
     const func = require(filePath);
