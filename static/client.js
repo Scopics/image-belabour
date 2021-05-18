@@ -4,6 +4,7 @@ generateBtn.addEventListener('click', (e) => {
   const body = {
     data: Array.from(imageData.data),
   };
+
   fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

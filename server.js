@@ -5,31 +5,26 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const processingCore = require('./app/processing-core');
-const MIME_TYPES = require('./MIME_TYPES.json')
+const MIME_TYPES = require('./MIME_TYPES.json');
 
 const PORT = 8000;
 const count = os.cpus().length;
 const transformFilesPath = './app/transform/';
-const api = new Map();
 let methods;
 
-const getBaseName = file => path.basename(file, '.js');
+const getBaseName = (file) => path.basename(file, '.js');
 
 async function getMethods(directory) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     fs.readdir(directory, (err, files) => {
-      if (err) {
-        reject(err)
-      } else {
-        const baseNames = files.map(getBaseName);
-        resolve(baseNames);
-      }
-    })
-  })
+      const baseNames = files.map(getBaseName);
+      resolve(baseNames);
+    });
+  });
 }
 
 async function getArgs(req) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const chuncks = [];
     req.on('data', (chunck) => {
       chuncks.push(chunck);
@@ -43,55 +38,58 @@ async function getArgs(req) {
 
 function sendError(res) {
   res.statusCode = 500;
-  res.end('Unknown method');
+  res.end('Server error');
 }
 
 const server = http.createServer(async (req, res) => {
   const url = req.url;
-  console.log(url);
-  const urlSplitted = url.slice(1).split('/');
-  const isApi = urlSplitted[0] === 'api';
+  const [urlPar1, urlPar2] = url.slice(1).split('/');
+  const isApi = urlPar1 === 'api';
   if (isApi) {
-    const urlMethod = urlSplitted[1];
-    const method = api.get(urlMethod);
-    if (!method) {
+    const method = urlPar2;
+    if (!methods.includes(method)) {
       sendError(res);
       return;
     }
     const args = await getArgs(req);
     const imageData = args.data;
-    const params = [imageData, count, urlMethod];
+    const params = [imageData, count, method];
     const processedImage = await processingCore.balancer(...params);
     res.end(JSON.stringify(processedImage));
   } else {
-    const isMethod = methods.includes(url.slice(1));
-    const file = isMethod ? './static/index.html' : path.join('./static', url);
-    const fileExt = path.extname(file).slice(1);
-    if (!fileExt) {
+    let fileExt = path.extname(url).slice(1);
+    const isFile = fileExt.length > 0;
+    const isMethod = methods.includes(urlPar1);
+    if (!isFile && !isMethod) {
       sendError(res);
       return;
     }
+
+    if (isMethod) fileExt = 'html';
+    const file = path.join('./static', isMethod ? '/index.html' : url);
     const mimeType = MIME_TYPES[fileExt];
-    try {
-      fs.readFile(file, (err, data) => {
-        if (err) {
-          sendError(res);
-          return;
-        }
-        res.writeHead(200, { 'Content-Type': mimeType });
-        res.end(data);
-      });
-    } catch (e) {
-      sendError(res);
-      return;
-    }
+
+    fs.readFile(file, (err, data) => {
+      if (err) {
+        sendError(res);
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': mimeType });
+      res.end(data);
+    });
   }
 });
 
 async function startServer() {
-  methods = await getMethods(transformFilesPath);
-  processingCore.runner(count);
-  server.listen(PORT);  
+  try {
+    methods = await getMethods(transformFilesPath);
+    processingCore.runner(count);
+    server.listen(PORT, () => {
+      console.log(`Server is listening on port ${PORT}`);
+    });
+  } catch (e) {
+    console.log(e.message);
+  }
 }
 
 startServer();
