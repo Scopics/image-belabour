@@ -13,23 +13,19 @@ const transformFilesPath = './app/transform/';
 const api = new Map();
 let methods;
 
-const cacheFile = (directory, name) => {
-  const filePath = path.join(__dirname, directory + name);
-  const method = name.split('.')[0];
-  try {
-    const func = require(filePath);
-    api.set(method, func);
-    methods = Array.from(api.keys());
-  } catch (e) {
-    api.delete(method);
-  }
-};
+const getBaseName = file => path.basename(file, '.js');
 
-function cacheFolder(directory) {
-  const cacheFilePath = cacheFile.bind(null, directory);
-  fs.readdir(directory, (err, files) => {
-    files.forEach(cacheFilePath);
-  });
+async function getMethods(directory) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(directory, (err, files) => {
+      if (err) {
+        reject(err)
+      } else {
+        const baseNames = files.map(getBaseName);
+        resolve(baseNames);
+      }
+    })
+  })
 }
 
 async function getArgs(req) {
@@ -49,8 +45,6 @@ function sendError(res) {
   res.statusCode = 500;
   res.end('Unknown method');
 }
-
-cacheFolder(transformFilesPath);
 
 const server = http.createServer(async (req, res) => {
   const url = req.url;
@@ -94,5 +88,10 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-processingCore.runner(count);
-server.listen(PORT);
+async function startServer() {
+  methods = await getMethods(transformFilesPath);
+  processingCore.runner(count);
+  server.listen(PORT);  
+}
+
+startServer();
