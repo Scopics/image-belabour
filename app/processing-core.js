@@ -18,7 +18,7 @@ const balancer = (data, countWorkers, method) => {
   const size = Math.floor(len / countWorkers);
   const tasks = [];
   for (let i = 0; i < countWorkers; i++) {
-    tasks[i] = Buffer.from(data.slice(i * size, i * size + size));
+    tasks[i] = data.slice(i * size, i * size + size);
   }
 
   let finished = 0;
@@ -26,8 +26,8 @@ const balancer = (data, countWorkers, method) => {
   return new Promise((resolve) => {
     for (let i = 0; i < countWorkers; i++) {
       workers[i].on('message', (message) => {
-        const { buffer, workerId } = message;
-        results[workerId] = buffer.data;
+        const { exportRes, workerId } = message;
+        results[workerId] = exportRes;
 
         finished++;
         if (finished === countWorkers) {
@@ -36,7 +36,7 @@ const balancer = (data, countWorkers, method) => {
       });
 
       workers[i].send({
-        buffer: tasks[i],
+        task: tasks[i],
         workerId: i,
         method,
       });
