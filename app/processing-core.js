@@ -1,12 +1,14 @@
 'use strict';
 
 const cp = require('child_process');
+const util = require('util');
+const forkPromisified = util.promisify(cp.fork);
 
 const workers = new Array();
 
-const runner = (countWorkers) => {
+const runner = async (countWorkers) => {
   for (let i = 0; i < countWorkers; i++) {
-    const worker = cp.fork('./app/lib/worker.js');
+    const worker = await forkPromisified('./app/lib/worker.js');
     console.log('Started worker:', worker.pid);
     workers.push(worker);
   }
