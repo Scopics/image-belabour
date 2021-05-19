@@ -15,8 +15,9 @@ let methods;
 const getBaseName = (file) => path.basename(file, '.js');
 
 async function getMethods(directory) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     fs.readdir(directory, (err, files) => {
+      if (err) reject(err);
       const baseNames = files.map(getBaseName);
       resolve(baseNames);
     });
@@ -24,15 +25,20 @@ async function getMethods(directory) {
 }
 
 async function getArgs(req) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const chuncks = [];
-    req.on('data', (chunck) => {
-      chuncks.push(chunck);
-    });
-    req.on('end', () => {
-      const args = JSON.parse(chuncks.join(''));
-      resolve(args);
-    });
+    try {
+      req.on('data', (chunck) => {
+        chuncks.push(chunck);
+      });
+      req.on('end', () => {
+        const args = JSON.parse(chuncks.join(''));
+        resolve(args);
+      });
+    } catch(e) {
+      reject(e)
+    }
+
   });
 }
 
@@ -51,11 +57,16 @@ const server = http.createServer(async (req, res) => {
       sendError(res);
       return;
     }
-    const args = await getArgs(req);
-    const imageData = args.data;
-    const params = [imageData, count, method];
-    const processedImage = await processingCore.balancer(...params);
-    res.end(JSON.stringify(processedImage));
+    try {
+      const args = await getArgs(req);
+      const imageData = args.data;
+      const params = [imageData, count, method];
+      const processedImage = await processingCore.balancer(...params);
+      res.end(JSON.stringify(processedImage));
+    } catch(e) {
+      sendError(res);
+      return;
+    }
   } else {
     let fileExt = path.extname(url).slice(1);
     const isFile = fileExt.length > 0;
