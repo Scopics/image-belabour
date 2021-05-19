@@ -35,10 +35,9 @@ async function getArgs(req) {
         const args = JSON.parse(chuncks.join(''));
         resolve(args);
       });
-    } catch(e) {
-      reject(e)
+    } catch (e) {
+      reject(e);
     }
-
   });
 }
 
@@ -63,7 +62,7 @@ const server = http.createServer(async (req, res) => {
       const params = [imageData, count, method];
       const processedImage = await processingCore.balancer(...params);
       res.end(JSON.stringify(processedImage));
-    } catch(e) {
+    } catch (e) {
       sendError(res);
       return;
     }
