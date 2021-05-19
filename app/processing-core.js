@@ -28,12 +28,17 @@ const balancer = (data, countWorkers, method) => {
 
     const onMessage = (message) => {
       const { exportRes, workerId } = message;
+      if (!exportRes)
+        reject(
+          new Error(
+            'No transformation function, or the transformation was not successful'
+          )
+        );
       results[workerId] = exportRes;
 
       finished++;
       if (finished === countWorkers) {
         workers.forEach((worker) => {
-          console.log('yes');
           worker.removeListener('message', onMessage);
           worker.removeListener('error', onError);
         });
