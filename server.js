@@ -79,20 +79,12 @@ const server = http.createServer(async (req, res) => {
     const file = path.join('./static', isMethod ? '/index.html' : url);
     const mimeType = MIME_TYPES[fileExt];
 
-    try {
-      const rs = fs.createReadStream(file, 'utf8');
-      const chuncks = [];
-
-      rs.on('data', (chunk) => {
-        chuncks.push(chunk);
-      });
-
-      rs.on('end', () => {
-        res.writeHead(200, { 'Content-Type': mimeType });
-        res.end(chuncks.join('\n'));
-      });
-    } catch (e) {
-      sendError(res);
+    const stream = fs.createReadStream(file, 'utf8');
+    if (stream) {
+      res.writeHead(200, { 'Content-Type': mimeType });
+      stream.pipe(res);
+    } else {
+      sendError(res, 404, 'Not found');
     }
   }
 });
