@@ -14,7 +14,7 @@ const methods = new Set();
 
 const getBaseName = (file) => path.basename(file, '.js');
 
-async function getMethods(directory) {
+function getMethods(directory) {
   return new Promise((resolve, reject) => {
     fs.readdir(directory, (err, files) => {
       if (err) reject(err);
@@ -24,7 +24,7 @@ async function getMethods(directory) {
   });
 }
 
-async function getArgs(req) {
+function getArgs(req) {
   return new Promise((resolve, reject) => {
     const chuncks = [];
     try {
