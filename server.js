@@ -14,7 +14,7 @@ const methods = new Set();
 
 const getBaseName = (file) => path.basename(file, '.js');
 
-async function getMethods(directory) {
+function getMethods(directory) {
   return new Promise((resolve, reject) => {
     fs.readdir(directory, (err, files) => {
       if (err) reject(err);
@@ -24,7 +24,7 @@ async function getMethods(directory) {
   });
 }
 
-async function getArgs(req) {
+function getArgs(req) {
   return new Promise((resolve, reject) => {
     const chuncks = [];
     try {
@@ -79,14 +79,21 @@ const server = http.createServer(async (req, res) => {
     const file = path.join('./static', isMethod ? '/index.html' : url);
     const mimeType = MIME_TYPES[fileExt];
 
-    fs.readFile(file, (err, data) => {
-      if (err) {
-        sendError(res);
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': mimeType });
-      res.end(data);
-    });
+    try {
+      const rs = fs.createReadStream(file, 'utf8');
+      const chuncks = [];
+
+      rs.on('data', (chunk) => {
+        chuncks.push(chunk);
+      });
+
+      rs.on('end', () => {
+        res.writeHead(200, { 'Content-Type': mimeType });
+        res.end(chuncks.join('\n'));
+      });
+    } catch (e) {
+      sendError(res);
+    }
   }
 });
 
