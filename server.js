@@ -10,7 +10,7 @@ const MIME_TYPES = require('./MIME_TYPES.json');
 const PORT = 8000;
 const count = os.cpus().length;
 const transformFilesPath = './app/transform/';
-let methods;
+const methods = new Set();
 
 const getBaseName = (file) => path.basename(file, '.js');
 
@@ -52,7 +52,7 @@ const server = http.createServer(async (req, res) => {
   const isApi = urlPar1 === 'api';
   if (isApi) {
     const method = urlPar2;
-    if (!methods.includes(method)) {
+    if (!methods.has(method)) {
       sendError(res);
       return;
     }
@@ -69,7 +69,7 @@ const server = http.createServer(async (req, res) => {
   } else {
     let fileExt = path.extname(url).slice(1);
     const isFile = fileExt.length > 0;
-    const isMethod = methods.includes(urlPar1);
+    const isMethod = methods.has(urlPar1);
     if (!isFile && !isMethod) {
       sendError(res);
       return;
@@ -92,7 +92,10 @@ const server = http.createServer(async (req, res) => {
 
 async function startServer() {
   try {
-    methods = await getMethods(transformFilesPath);
+    getMethods(transformFilesPath)
+      .then(results => {
+        results.forEach(mathod => methods.add(method));
+      });
     await processingCore.runner(count);
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
