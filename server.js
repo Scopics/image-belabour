@@ -94,7 +94,7 @@ async function startServer() {
   try {
     getMethods(transformFilesPath)
       .then(results => {
-        results.forEach(mathod => methods.add(method));
+        results.forEach(method => methods.add(method));
       });
     await processingCore.runner(count);
     server.listen(PORT, () => {
