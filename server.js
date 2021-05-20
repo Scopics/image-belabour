@@ -41,9 +41,9 @@ async function getArgs(req) {
   });
 }
 
-function sendError(res) {
-  res.statusCode = 500;
-  res.end('Server error');
+function sendError(res, statusCode, message) {
+  res.statusCode = statusCode || 500;
+  res.end(message || 'Server error');
 }
 
 const server = http.createServer(async (req, res) => {
@@ -53,7 +53,7 @@ const server = http.createServer(async (req, res) => {
   if (isApi) {
     const method = urlPar2;
     if (!methods.has(method)) {
-      sendError(res);
+      sendError(res, 404, 'Not Found');
       return;
     }
     try {
@@ -71,7 +71,7 @@ const server = http.createServer(async (req, res) => {
     const isFile = fileExt.length > 0;
     const isMethod = methods.has(urlPar1);
     if (!isFile && !isMethod) {
-      sendError(res);
+      sendError(res, 404, 'Not Found');
       return;
     }
 
