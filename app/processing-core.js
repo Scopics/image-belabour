@@ -19,7 +19,7 @@ const balancer = (data, countWorkers, method) => {
   const tasks = [];
   for (let i = 0; i < countWorkers; i++) {
     const offset = i * size;
-    const end = i === countWorkers - 1 ? countWorkers : offset + size;
+    const end = i === countWorkers - 1 ? len : offset + size;
     tasks[i] = data.slice(offset, end);
   }
 
