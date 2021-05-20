@@ -82,16 +82,16 @@ const server = http.createServer(async (req, res) => {
     try {
       const rs = fs.createReadStream(file, 'utf8');
       const chuncks = [];
-  
-      rs.on('data', chunk => {
+
+      rs.on('data', (chunk) => {
         chuncks.push(chunk);
       });
-  
+
       rs.on('end', () => {
         res.writeHead(200, { 'Content-Type': mimeType });
         res.end(chuncks.join('\n'));
-      })
-    } catch(e) {
+      });
+    } catch (e) {
       sendError(res);
     }
   }
@@ -99,10 +99,9 @@ const server = http.createServer(async (req, res) => {
 
 async function startServer() {
   try {
-    getMethods(transformFilesPath)
-      .then(results => {
-        results.forEach(method => methods.add(method));
-      });
+    getMethods(transformFilesPath).then((results) => {
+      results.forEach((method) => methods.add(method));
+    });
     await processingCore.runner(count);
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
