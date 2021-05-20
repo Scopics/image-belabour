@@ -92,10 +92,9 @@ const server = http.createServer(async (req, res) => {
 
 async function startServer() {
   try {
-    getMethods(transformFilesPath)
-      .then(results => {
-        results.forEach(method => methods.add(method));
-      });
+    getMethods(transformFilesPath).then((results) => {
+      results.forEach((method) => methods.add(method));
+    });
     await processingCore.runner(count);
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
