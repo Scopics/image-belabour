@@ -4,7 +4,7 @@ const cp = require('child_process');
 
 const workers = new Array();
 
-const runner = async (countWorkers) => {
+const runner = (countWorkers) => {
   for (let i = 0; i < countWorkers; i++) {
     const worker = cp.fork('./app/lib/worker.js');
     console.log('Started worker:', worker.pid);
