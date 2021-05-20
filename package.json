@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "lint": "eslint . && prettier -c \"**/*.js\" \"**/*.json\" \"**/*.md\"",
+    "fmt": "prettier --write \"**/*.js\" \"**/*.json\" \"**/*.md\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,7 +23,9 @@
     "url": "https://github.com/Scopics/image-belabour/issues"
   },
   "homepage": "https://github.com/Scopics/image-belabour#readme",
-  "dependencies": {},
+  "dependencies": {
+    "jimp": "^0.16.1"
+  },
   "devDependencies": {
     "eslint": "^7.25.0",
     "eslint-config-metarhia": "^7.0.1",
