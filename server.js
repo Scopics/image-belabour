@@ -79,22 +79,30 @@ const server = http.createServer(async (req, res) => {
     const file = path.join('./static', isMethod ? '/index.html' : url);
     const mimeType = MIME_TYPES[fileExt];
 
-    fs.readFile(file, (err, data) => {
-      if (err) {
-        sendError(res);
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': mimeType });
-      res.end(data);
-    });
+    try {
+      const rs = fs.createReadStream(file, 'utf8');
+      const chuncks = [];
+  
+      rs.on('data', chunk => {
+        chuncks.push(chunk);
+      });
+  
+      rs.on('end', () => {
+        res.writeHead(200, { 'Content-Type': mimeType });
+        res.end(chuncks.join('\n'));
+      })
+    } catch(e) {
+      sendError(res);
+    }
   }
 });
 
 async function startServer() {
   try {
-    getMethods(transformFilesPath).then((results) => {
-      results.forEach((method) => methods.add(method));
-    });
+    getMethods(transformFilesPath)
+      .then(results => {
+        results.forEach(method => methods.add(method));
+      });
     await processingCore.runner(count);
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
