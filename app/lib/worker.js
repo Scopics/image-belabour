@@ -26,11 +26,15 @@ process.on('message', (message) => {
   const transform = cachingRequire(method);
 
   if (transform) {
-    const data = new Uint8ClampedArray(task);
-    const result = transform(data);
+    try {
+      const data = new Uint8ClampedArray(task);
+      const result = transform(data);
 
-    const exportRes = Array.from(result);
-    process.send({ exportRes, workerId });
+      const exportRes = Array.from(result);
+      process.send({ exportRes, workerId });
+    } catch (error) {
+      process.send({ workerId, error });
+    }
   } else {
     process.send({ workerId });
   }
