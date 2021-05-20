@@ -27,7 +27,10 @@ const balancer = (data, countWorkers, method) => {
     const onError = (err) => reject(err);
 
     const onMessage = (message) => {
-      const { exportRes, workerId } = message;
+      const { exportRes, workerId, error } = message;
+      finished++;
+
+      if (error) reject(error);
       if (!exportRes) {
         reject(
           new Error(
@@ -35,9 +38,8 @@ const balancer = (data, countWorkers, method) => {
           )
         );
       }
-      results[workerId] = exportRes;
 
-      finished++;
+      results[workerId] = exportRes;
       if (finished === countWorkers) {
         workers.forEach((worker) => {
           worker.removeListener('message', onMessage);
