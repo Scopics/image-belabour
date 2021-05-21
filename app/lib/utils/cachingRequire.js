@@ -3,7 +3,9 @@
 const path = require('path');
 
 const cachingRequire = (cacheSize = 10) => {
-  if (cacheSize <= 0) throw new Error('Cache size must be positive number');
+  if (!parseInt(cacheSize) || cacheSize <= 0) {
+    throw new Error('Cache size must be positive number');
+  }
   const modules = new Map();
   return (methodPath) => {
     const key = path.basename(methodPath, '.js');
