@@ -1,50 +1,18 @@
 'use strict';
 
 const http = require('http');
-const fs = require('fs');
-const os = require('os');
 const path = require('path');
+const {
+  getMethods,
+  sendError,
+  sendFile,
+  processImage
+} = require('./server/utils');
 const processingCore = require('./app/processing-core');
-const MIME_TYPES = require('./MIME_TYPES.json');
+const { count, PORT } = require('./server/config');
 
-const PORT = 8000;
-const count = os.cpus().length;
 const transformFilesPath = './app/transform/';
 const methods = new Set();
-
-const getBaseName = (file) => path.basename(file, '.js');
-
-function getMethods(directory) {
-  return new Promise((resolve, reject) => {
-    fs.readdir(directory, (err, files) => {
-      if (err) reject(err);
-      const baseNames = files.map(getBaseName);
-      resolve(baseNames);
-    });
-  });
-}
-
-function getArgs(req) {
-  return new Promise((resolve, reject) => {
-    const chuncks = [];
-    try {
-      req.on('data', (chunck) => {
-        chuncks.push(chunck);
-      });
-      req.on('end', () => {
-        const args = JSON.parse(chuncks.join(''));
-        resolve(args);
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
-}
-
-function sendError(res, statusCode, message) {
-  res.statusCode = statusCode || 500;
-  res.end(message || 'Server error');
-}
 
 const server = http.createServer(async (req, res) => {
   const url = req.url;
@@ -57,11 +25,9 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     try {
-      const args = await getArgs(req);
-      const imageData = args.data;
-      const params = [imageData, count, method];
-      const processedImage = await processingCore.balancer(...params);
-      res.end(JSON.stringify(processedImage));
+      const processedImage = await processImage(req, method);
+      const concatedImageData = [].concat(...processedImage);
+      res.end(JSON.stringify(concatedImageData));
     } catch (e) {
       sendError(res);
       return;
@@ -76,25 +42,21 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (isMethod) fileExt = 'html';
-    const file = path.join('./static', isMethod ? '/index.html' : url);
-    const mimeType = MIME_TYPES[fileExt];
-
-    const stream = fs.createReadStream(file, 'utf8');
-    if (stream) {
-      res.writeHead(200, { 'Content-Type': mimeType });
-      stream.pipe(res);
-    } else {
-      sendError(res, 404, 'Not found');
-    }
+    const fileName = isMethod ? '/index.html' : url;
+    const file = path.join(__dirname, './static', fileName);
+    sendFile(res, file, fileExt);
   }
 });
 
 async function startServer() {
   try {
-    getMethods(transformFilesPath).then((results) => {
+    const transformFilesFullPath = path.join(__dirname, transformFilesPath);
+    getMethods(transformFilesFullPath).then((results) => {
       results.forEach((method) => methods.add(method));
     });
+    
     await processingCore.runner(count);
+    
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
     });

@@ -15,8 +15,7 @@ generateBtn.addEventListener('click', () => {
       return response.json();
     })
     .then((data) => {
-      const concatedData = [].concat(...data);
-      imageDataToImg(concatedData);
+      imageDataToImg(data);
     })
     .catch(() => {
       errorBlockElement.innerHTML = 'Error happened';
