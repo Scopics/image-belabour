@@ -15,7 +15,7 @@ const runner = (countWorkers) => {
 
 const killer = () => {
   workers.forEach(worker => worker.kill('SIGTERM'));
-}
+};
 
 const balancer = (data, countWorkers, method) => {
   const results = new Array(countWorkers);
