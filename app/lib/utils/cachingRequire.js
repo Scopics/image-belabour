@@ -12,6 +12,13 @@ const cachingRequire = (cacheSize = 10) => {
     if (modules.has(key)) return modules.get(key);
 
     try {
+      const libPath = require.resolve(methodPath);
+      delete require.cache[libPath];
+    } catch (e) {
+      return;
+    }
+
+    try {
       const method = require(methodPath);
       modules.set(key, method);
       const modSize = modules.size;
