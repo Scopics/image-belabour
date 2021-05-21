@@ -1,5 +1,5 @@
 'use strict';
 
-module.exports = (data) => {
+module.exports = () => {
   throw new Error('Error to check the test');
 };

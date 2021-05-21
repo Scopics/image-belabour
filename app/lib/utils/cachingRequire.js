@@ -15,7 +15,7 @@ const cachingRequire = (cacheSize = 10) => {
       const libPath = require.resolve(methodPath);
       delete require.cache[libPath];
     } catch (e) {
-      return;
+      return null;
     }
 
     try {

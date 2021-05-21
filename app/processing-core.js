@@ -14,7 +14,17 @@ const runner = (countWorkers) => {
 };
 
 const killer = () => {
-  workers.forEach(worker => worker.kill('SIGTERM'));
+  workers.forEach((worker) => worker.kill('SIGTERM'));
+};
+
+const removeListeners = (workers, eventNames, listeners) => {
+  for (const worker of workers) {
+    for (let i = 0; i < eventNames.length; i++) {
+      const eventName = eventNames[i];
+      const listener = listeners[i];
+      worker.removeListener(eventName, listener);
+    }
+  }
 };
 
 const balancer = (data, countWorkers, method) => {
@@ -31,13 +41,10 @@ const balancer = (data, countWorkers, method) => {
   let finished = 0;
 
   return new Promise((resolve, reject) => {
-    const onError = (err) => { 
-      workers.forEach((worker) => {
-        worker.removeListener('message', onMessage);
-        worker.removeListener('error', onError);
-      });
+    const onError = (err) => {
+      removeListeners(workers, ['message', 'error'], [onMessage, onError]);
       reject(err);
-    }
+    };
 
     const onMessage = (message) => {
       const { exportRes, workerId, error } = message;
@@ -54,10 +61,7 @@ const balancer = (data, countWorkers, method) => {
 
       results[workerId] = exportRes;
       if (finished === countWorkers) {
-        workers.forEach((worker) => {
-          worker.removeListener('message', onMessage);
-          worker.removeListener('error', onError);
-        });
+        removeListeners(workers, ['message', 'error'], [onMessage, onError]);
         resolve(results);
       }
     };
