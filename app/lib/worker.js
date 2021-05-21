@@ -1,29 +1,14 @@
 'use strict';
 
 const path = require('path');
+const crequire = require('./utils/cachingRequire')();
 
 console.log('Run worker', process.pid);
 
-const transforms = new Map();
-
-const cachingRequire = (module) => {
-  const methodPath = path.resolve(__dirname, '../transform', `${module}.js`);
-  const key = path.basename(methodPath, '.js');
-  if (transforms.has(key)) return transforms.get(key);
-
-  try {
-    const method = require(methodPath);
-    transforms.set(key, method);
-  } catch (e) {
-    transforms.delete(key);
-  }
-
-  return transforms.get(key);
-};
-
 process.on('message', (message) => {
   const { task, workerId, method } = message;
-  const transform = cachingRequire(method);
+  const methodPath = path.resolve(__dirname, '../transform', `${method}.js`);
+  const transform = crequire(methodPath);
 
   if (transform) {
     try {
