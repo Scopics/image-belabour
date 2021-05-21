@@ -7,9 +7,9 @@ const cachingRequire = (cacheSize = 10) => {
     throw new Error('Cache size must be positive number');
   }
   const modules = new Map();
-  return (methodPath) => {
+  return (methodPath, options = {}) => {
     const key = path.basename(methodPath, '.js');
-    if (modules.has(key)) return modules.get(key);
+    if (modules.has(key) && !options.update) return modules.get(key);
 
     try {
       const libPath = require.resolve(methodPath);
