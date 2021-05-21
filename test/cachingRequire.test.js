@@ -50,6 +50,23 @@ metatests.test('test cachingRequire get module', (test) => {
   test.end();
 });
 
+metatests.test('test cachingRequire get modules from cache', (test) => {
+  const crequire = cachingRequire();
+  const pathLib1 = path.resolve(__dirname, 'test.js');
+
+  fs.writeFileSync(pathLib1, 'module.exports = 5;', 'utf8');
+  const actual = crequire(pathLib1);
+
+  fs.writeFileSync(pathLib1, 'module.exports = 6;', 'utf8');
+  const actualCached = crequire(pathLib1);
+
+  fs.rmSync(pathLib1);
+  test.equal(actual, 5, 'Value not expected');
+  test.equal(actualCached, 5, 'The value is not taken from the cache');
+
+  test.end();
+});
+
 metatests.test('test cachingRequire deleting modules from cache', (test) => {
   const crequire = cachingRequire(1);
   const pathLib1 = path.resolve(__dirname, 'test.js');
@@ -65,6 +82,22 @@ metatests.test('test cachingRequire deleting modules from cache', (test) => {
   fs.rmSync(pathLib1);
   test.equal(actual1, 5, 'Value not expected');
   test.equal(actual1NotCached, 6, 'The cache wasn\'t cleared');
+
+  test.end();
+});
+
+metatests.test('test cachingRequire deleting modules after error', (test) => {
+  const crequire = cachingRequire();
+  const pathLib1 = path.resolve(__dirname, 'test.js');
+
+  fs.writeFileSync(pathLib1, 'module.exports = 5;', 'utf8');
+  const actual1 = crequire(pathLib1);
+  
+  fs.rmSync(pathLib1);
+  const actual1NotCached = crequire(pathLib1, { update: true });
+
+  test.equal(actual1, 5, 'Value not expected');
+  test.equal(actual1NotCached, undefined, 'The library was not deleted from the cache by the error');
 
   test.end();
 });
