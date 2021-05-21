@@ -13,6 +13,10 @@ const runner = (countWorkers) => {
   return workers.map((worker) => worker.pid);
 };
 
+const killer = () => {
+  workers.forEach(worker => worker.kill('SIGTERM'));
+}
+
 const balancer = (data, countWorkers, method) => {
   const results = new Array(countWorkers);
   const len = data.length;
@@ -68,5 +72,6 @@ const balancer = (data, countWorkers, method) => {
 
 module.exports = {
   runner,
+  killer,
   balancer,
 };
