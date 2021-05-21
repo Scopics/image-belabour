@@ -2,19 +2,30 @@
 
 const path = require('path');
 
-const cachingRequire = (collection, folder) => (module) => {
-  const methodPath = path.resolve(__dirname, folder, `${module}.js`);
-  const key = path.basename(methodPath, '.js');
-  if (collection.has(key)) return collection.get(key);
+const cachingRequire = (cacheSize = 10) => {
+  const modules = new Map();
+  return (methodPath) => {
+    const key = path.basename(methodPath, '.js');
+    if (modules.has(key)) return modules.get(key);
 
-  try {
-    const method = require(methodPath);
-    collection.set(key, method);
-  } catch (e) {
-    collection.delete(key);
-  }
+    try {
+      const method = require(methodPath);
+      modules.set(key, method);
+      const modSize = modules.size;
+      if (modSize > cacheSize) {
+        const keys = [...modules.keys()];
+        const overSize = modSize - cacheSize;
+        for (let i = 0; i < overSize; i++) {
+          const key = keys[i];
+          modules.delete(key);
+        }
+      }
+    } catch (e) {
+      modules.delete(key);
+    }
 
-  return collection.get(key);
+    return modules.get(key);
+  };
 };
 
 module.exports = cachingRequire;
