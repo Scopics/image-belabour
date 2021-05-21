@@ -31,7 +31,13 @@ const balancer = (data, countWorkers, method) => {
   let finished = 0;
 
   return new Promise((resolve, reject) => {
-    const onError = (err) => reject(err);
+    const onError = (err) => { 
+      workers.forEach((worker) => {
+        worker.removeListener('message', onMessage);
+        worker.removeListener('error', onError);
+      });
+      reject(err);
+    }
 
     const onMessage = (message) => {
       const { exportRes, workerId, error } = message;
