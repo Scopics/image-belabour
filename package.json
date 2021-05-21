@@ -4,9 +4,9 @@
   "description": "Project for processing images by transform RGB function with NodeJS.",
   "main": "server.js",
   "scripts": {
+    "test": "metatests test/",
     "lint": "eslint . && prettier -c \"**/*.js\" \"**/*.json\" \"**/*.md\"",
-    "fmt": "prettier --write \"**/*.js\" \"**/*.json\" \"**/*.md\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "fmt": "prettier --write \"**/*.js\" \"**/*.json\" \"**/*.md\""
   },
   "repository": {
     "type": "git",
