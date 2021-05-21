@@ -6,7 +6,7 @@ const {
   getMethods,
   sendError,
   sendFile,
-  processImage
+  processImage,
 } = require('./server/utils');
 const processingCore = require('./app/processing-core');
 const { count, PORT } = require('./server/config');
@@ -54,9 +54,9 @@ async function startServer() {
     getMethods(transformFilesFullPath).then((results) => {
       results.forEach((method) => methods.add(method));
     });
-    
+
     await processingCore.runner(count);
-    
+
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
     });

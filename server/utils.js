@@ -8,8 +8,8 @@ const { count } = require('./config');
 
 const getBaseName = (file) => path.basename(file, '.js');
 
-function getMethods(directory) {
-  return new Promise((resolve, reject) => {
+const getMethods = (directory) =>
+  new Promise((resolve) => {
     fs.readdir(directory, (err, files) => {
       if (err) {
         resolve(new Array());
@@ -18,11 +18,10 @@ function getMethods(directory) {
       const baseNames = files.map(getBaseName);
       resolve(baseNames);
     });
-  })
-}
+  });
 
-function getArgs(req) {
-  return new Promise((resolve, reject) => {
+const getArgs = (req) =>
+  new Promise((resolve, reject) => {
     const chuncks = [];
     try {
       req.on('data', (chunck) => {
@@ -36,7 +35,6 @@ function getArgs(req) {
       reject(e);
     }
   });
-}
 
 function sendError(res, statusCode, message) {
   res.statusCode = statusCode || 500;
@@ -67,5 +65,5 @@ module.exports = {
   getMethods,
   sendError,
   sendFile,
-  processImage
-}
+  processImage,
+};
