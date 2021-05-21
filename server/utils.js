@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
 const processingCore = require('../app/processing-core');
@@ -9,11 +11,14 @@ const getBaseName = (file) => path.basename(file, '.js');
 function getMethods(directory) {
   return new Promise((resolve, reject) => {
     fs.readdir(directory, (err, files) => {
-      if (err) reject(err);
+      if (err) {
+        resolve(new Array());
+        return;
+      }
       const baseNames = files.map(getBaseName);
       resolve(baseNames);
     });
-  });
+  })
 }
 
 function getArgs(req) {
