@@ -1,6 +1,7 @@
 const currentUrl = window.location.pathname;
+const errorBlockElement = document.getElementById('error-block');
 const url = `/api${currentUrl}`;
-generateBtn.addEventListener('click', (e) => {
+generateBtn.addEventListener('click', () => {
   const body = {
     data: Array.from(imageData.data),
   };
@@ -16,5 +17,8 @@ generateBtn.addEventListener('click', (e) => {
     .then((data) => {
       const concatedData = [].concat(...data);
       imageDataToImg(concatedData);
+    })
+    .catch(() => {
+      errorBlockElement.innerHTML = 'Error happened';
     });
 });

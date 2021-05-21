@@ -4,7 +4,7 @@ const cp = require('child_process');
 
 const workers = new Array();
 
-const runner = async (countWorkers) => {
+const runner = (countWorkers) => {
   for (let i = 0; i < countWorkers; i++) {
     const worker = cp.fork('./app/lib/worker.js');
     console.log('Started worker:', worker.pid);
@@ -18,7 +18,9 @@ const balancer = (data, countWorkers, method) => {
   const size = Math.floor(len / countWorkers);
   const tasks = [];
   for (let i = 0; i < countWorkers; i++) {
-    tasks[i] = data.slice(i * size, i * size + size);
+    const offset = i * size;
+    const end = i === countWorkers - 1 ? len : offset + size;
+    tasks[i] = data.slice(offset, end);
   }
 
   let finished = 0;
@@ -27,13 +29,21 @@ const balancer = (data, countWorkers, method) => {
     const onError = (err) => reject(err);
 
     const onMessage = (message) => {
-      const { exportRes, workerId } = message;
-      results[workerId] = exportRes;
-
+      const { exportRes, workerId, error } = message;
       finished++;
+
+      if (error) reject(error);
+      if (!exportRes) {
+        reject(
+          new Error(
+            'No transformation function, or the transformation was not successful'
+          )
+        );
+      }
+
+      results[workerId] = exportRes;
       if (finished === countWorkers) {
         workers.forEach((worker) => {
-          console.log('yes');
           worker.removeListener('message', onMessage);
           worker.removeListener('error', onError);
         });

@@ -10,11 +10,11 @@ const MIME_TYPES = require('./MIME_TYPES.json');
 const PORT = 8000;
 const count = os.cpus().length;
 const transformFilesPath = './app/transform/';
-let methods;
+const methods = new Set();
 
 const getBaseName = (file) => path.basename(file, '.js');
 
-async function getMethods(directory) {
+function getMethods(directory) {
   return new Promise((resolve, reject) => {
     fs.readdir(directory, (err, files) => {
       if (err) reject(err);
@@ -24,7 +24,7 @@ async function getMethods(directory) {
   });
 }
 
-async function getArgs(req) {
+function getArgs(req) {
   return new Promise((resolve, reject) => {
     const chuncks = [];
     try {
@@ -35,16 +35,15 @@ async function getArgs(req) {
         const args = JSON.parse(chuncks.join(''));
         resolve(args);
       });
-    } catch(e) {
-      reject(e)
+    } catch (e) {
+      reject(e);
     }
-
   });
 }
 
-function sendError(res) {
-  res.statusCode = 500;
-  res.end('Server error');
+function sendError(res, statusCode, message) {
+  res.statusCode = statusCode || 500;
+  res.end(message || 'Server error');
 }
 
 const server = http.createServer(async (req, res) => {
@@ -53,8 +52,8 @@ const server = http.createServer(async (req, res) => {
   const isApi = urlPar1 === 'api';
   if (isApi) {
     const method = urlPar2;
-    if (!methods.includes(method)) {
-      sendError(res);
+    if (!methods.has(method)) {
+      sendError(res, 404, 'Not Found');
       return;
     }
     try {
@@ -63,16 +62,16 @@ const server = http.createServer(async (req, res) => {
       const params = [imageData, count, method];
       const processedImage = await processingCore.balancer(...params);
       res.end(JSON.stringify(processedImage));
-    } catch(e) {
+    } catch (e) {
       sendError(res);
       return;
     }
   } else {
     let fileExt = path.extname(url).slice(1);
     const isFile = fileExt.length > 0;
-    const isMethod = methods.includes(urlPar1);
+    const isMethod = methods.has(urlPar1);
     if (!isFile && !isMethod) {
-      sendError(res);
+      sendError(res, 404, 'Not Found');
       return;
     }
 
@@ -80,20 +79,21 @@ const server = http.createServer(async (req, res) => {
     const file = path.join('./static', isMethod ? '/index.html' : url);
     const mimeType = MIME_TYPES[fileExt];
 
-    fs.readFile(file, (err, data) => {
-      if (err) {
-        sendError(res);
-        return;
-      }
+    const stream = fs.createReadStream(file, 'utf8');
+    if (stream) {
       res.writeHead(200, { 'Content-Type': mimeType });
-      res.end(data);
-    });
+      stream.pipe(res);
+    } else {
+      sendError(res, 404, 'Not found');
+    }
   }
 });
 
 async function startServer() {
   try {
-    methods = await getMethods(transformFilesPath);
+    getMethods(transformFilesPath).then((results) => {
+      results.forEach((method) => methods.add(method));
+    });
     await processingCore.runner(count);
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
