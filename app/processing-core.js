@@ -10,6 +10,7 @@ const runner = (countWorkers) => {
     console.log('Started worker:', worker.pid);
     workers.push(worker);
   }
+  return workers.map(worker => worker.pid);
 };
 
 const balancer = (data, countWorkers, method) => {
