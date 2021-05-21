@@ -5,46 +5,17 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const processingCore = require('./app/processing-core');
+const {
+  getMethods,
+  getArgs,
+  sendError
+} = require('./server/utils');
 const MIME_TYPES = require('./MIME_TYPES.json');
 
 const PORT = 8000;
 const count = os.cpus().length;
 const transformFilesPath = './app/transform/';
 const methods = new Set();
-
-const getBaseName = (file) => path.basename(file, '.js');
-
-function getMethods(directory) {
-  return new Promise((resolve, reject) => {
-    fs.readdir(directory, (err, files) => {
-      if (err) reject(err);
-      const baseNames = files.map(getBaseName);
-      resolve(baseNames);
-    });
-  });
-}
-
-function getArgs(req) {
-  return new Promise((resolve, reject) => {
-    const chuncks = [];
-    try {
-      req.on('data', (chunck) => {
-        chuncks.push(chunck);
-      });
-      req.on('end', () => {
-        const args = JSON.parse(chuncks.join(''));
-        resolve(args);
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
-}
-
-function sendError(res, statusCode, message) {
-  res.statusCode = statusCode || 500;
-  res.end(message || 'Server error');
-}
 
 const server = http.createServer(async (req, res) => {
   const url = req.url;
