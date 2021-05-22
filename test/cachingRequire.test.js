@@ -44,7 +44,7 @@ metatests.test('test cachingRequire get module', (test) => {
   );
   test.strictSame(
     actualNoExistPath,
-    undefined,
+    null,
     'with a module that does not exist we should get undefined'
   );
   test.end();
