@@ -12,7 +12,6 @@ on:
 
 env:
   IMAGE_NAME: docker.pkg.github.com/scopics/image-belabour/image-belabour
-  VERSION: latest
 
 jobs:
   lint:
@@ -62,5 +61,7 @@ jobs:
         run: echo "${{ secrets.SCOPICS_ACESS_TOKEN }}" | docker login https://docker.pkg.github.com -u ${{ github.actor }} --password-stdin
       - name: Docker build & push
         run: |
+          VERSION=$(git describe --tags --abbrev=0 | sed 's/v//g')
+          echo version: $VERSION
           docker build -f Dockerfile . -t $IMAGE_NAME:$VERSION
           docker push $IMAGE_NAME:$VERSION
