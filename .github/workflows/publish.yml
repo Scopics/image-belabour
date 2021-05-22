@@ -7,8 +7,6 @@ on:
   push:
     tags:
       - v*
-  pull_request:
-    branches: [main]
 
 env:
   IMAGE_NAME: docker.pkg.github.com/scopics/image-belabour/image-belabour
