@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "metatests test/",
-    "lint": "eslint . && prettier -c \"**/*.js\" \"**/*.json\" \"**/*.md\"",
-    "fmt": "prettier --write \"**/*.js\" \"**/*.json\" \"**/*.md\""
+    "lint": "eslint . && prettier -c \"**/*.js\" \"**/*.json\" \"**/*.md\" \"**/*.yml\"",
+    "fmt": "prettier --write \"**/*.js\" \"**/*.json\" \"**/*.md\" \"**/*.yml\""
   },
   "repository": {
     "type": "git",
