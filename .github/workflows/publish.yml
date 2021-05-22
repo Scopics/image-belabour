@@ -3,10 +3,7 @@ name: Build and publish
 on:
   release:
     types:
-      - created
-  push:
-    tags:
-      - v*
+      - published
 
 env:
   IMAGE_NAME: docker.pkg.github.com/scopics/image-belabour/image-belabour
