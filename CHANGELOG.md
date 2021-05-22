@@ -1,6 +1,5 @@
 # History Of Changes
 
-
 ## [1.0.0][] - 20.05.2021
 - Improved code style
 - Changed formats of processing data to improve speed
