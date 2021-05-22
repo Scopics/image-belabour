@@ -16,6 +16,7 @@ Steps to reproduce the behavior:
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
+
 **Device (please complete the following information):**
  - OS: [e.g. iOS]
  - Browser [e.g. chrome, safari]
