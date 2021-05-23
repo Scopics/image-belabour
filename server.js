@@ -55,7 +55,7 @@ async function startServer() {
       results.forEach((method) => methods.add(method));
     });
 
-    await processingCore.runner(count);
+    const pids = await processingCore.runner(count);
 
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
