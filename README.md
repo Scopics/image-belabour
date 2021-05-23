@@ -29,12 +29,12 @@
 
 ## Contributors
 
-[![Contributors](https://img.shields.io/github/contributors-anon/scopics/image-belabour)]()
+[![Contributors](https://img.shields.io/github/contributors-anon/scopics/image-belabour)](https://github.com/Scopics/image-belabour#contributors)
 
 | Contributor                                         | Telegram                                | Gmail                                          |
 | :-------------------------------------------------: |:---------------------------------------:| :---------------------------------------------:|
-| [Maxim Govoruha](https://github.com/MaksGovor)      | [Maksgovorrr](https://t.me/Maksgovorrr) | [maksgovruha@gmail.com](maksgovruha@gmail.com) |
-| [Uryn Dmytro](https://github.com/tedi4t)            | [tedi4t](https://t.me/tedi4t)           | [tedi4t@gmail.com](tedi4t@gmail.com)           |
+| [Maxim Govoruha](https://github.com/MaksGovor)      | [Maksgovorrr](https://t.me/Maksgovorrr) | [maksgovruha@gmail.com](mailto:maksgovruha@gmail.com) |
+| [Uryn Dmytro](https://github.com/tedi4t)            | [tedi4t](https://t.me/tedi4t)           | [tedi4t@gmail.com](mailto:tedi4t@gmail.com)           |
 
 ## Licence
 
