@@ -4,7 +4,6 @@ const path = require('path');
 const cachingRequire= require('./utils/cachingRequire');
 const crequire = cachingRequire();
 
-console.log('Run worker', process.pid);
 
 process.on('message', (message) => {
   const { task, workerId, method } = message;
