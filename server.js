@@ -59,6 +59,7 @@ async function startServer() {
 
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
+      console.log(`The processes are running with the following pid: ${pids}`)
     });
   } catch (e) {
     console.log(e.message);
