@@ -1,7 +1,8 @@
 'use strict';
 
 const path = require('path');
-const crequire = require('./utils/cachingRequire')();
+const cachingRequire= require('./utils/cachingRequire');
+const crequire = cachingRequire();
 
 console.log('Run worker', process.pid);
 
