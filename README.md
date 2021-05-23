@@ -1,4 +1,4 @@
-# image-belabour [![Stars](https://img.shields.io/github/stars/scopics/image-belabour?style=social)](https://github.com/Scopics/image-belabour/stargazers)
+# Image belabour [![Stars](https://img.shields.io/github/stars/scopics/image-belabour?style=social)](https://github.com/Scopics/image-belabour/stargazers)
 
 [![Testing CI](https://github.com/Scopics/image-belabour/actions/workflows/test.yml/badge.svg)](https://github.com/Scopics/image-belabour/actions/workflows/test.yml)
 [![Build and publish](https://github.com/Scopics/image-belabour/actions/workflows/publish.yml/badge.svg)](https://github.com/Scopics/image-belabour/actions/workflows/publish.yml)
