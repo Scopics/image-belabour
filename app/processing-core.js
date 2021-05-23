@@ -7,7 +7,6 @@ const workers = new Array();
 const runner = (countWorkers) => {
   for (let i = 0; i < countWorkers; i++) {
     const worker = cp.fork('./app/lib/worker.js');
-    console.log('Started worker:', worker.pid);
     workers.push(worker);
   }
   return workers.map((worker) => worker.pid);
