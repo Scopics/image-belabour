@@ -19,6 +19,9 @@
   ],
   "author": "Scopics",
   "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "bugs": {
     "url": "https://github.com/Scopics/image-belabour/issues"
   },
