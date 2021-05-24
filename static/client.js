@@ -3,7 +3,7 @@ const errorBlockElement = document.getElementById('error-block');
 const url = `/api${currentUrl}`;
 generateBtn.addEventListener('click', () => {
   const body = {
-    data: Array.from(imageData.data),
+    data: Array.from(state.imageData.data),
   };
 
   fetch(url, {

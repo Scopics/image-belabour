@@ -3,21 +3,22 @@
 const defaultImgElement = document.getElementById('file-img');
 const fileElement = document.getElementById('file');
 const generateBtn = document.getElementById('generate');
-let imageData;
 
-let w, h;
+const state = {
+  imageData: null,
+  width: 0,
+  height: 0,
+};
 
 defaultImgElement.onload = function () {
   const canvas = document.createElement('canvas');
-  canvas.width = defaultImgElement.width;
-  canvas.height = defaultImgElement.height;
+  const { width, height } = defaultImgElement;
+  Object.assign(state, { width, height });
+  Object.assign(canvas, { width, height });
   const context = canvas.getContext('2d');
   context.drawImage(defaultImgElement, 0, 0);
-  h = canvas.height;
-  w = canvas.width;
 
-  const { width, height } = defaultImgElement;
-  imageData = context.getImageData(0, 0, width, height);
+  state.imageData = context.getImageData(0, 0, width, height);
   generateBtn.disabled = false;
 };
 
@@ -35,9 +36,9 @@ fileElement.addEventListener('change', (e) => {
 function imageDataToImg(data) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = w;
-  canvas.height = h;
-  const imageData = new ImageData(new Uint8ClampedArray(data), w, h);
+  const { width, height } = state;
+  Object.assign(canvas, { width, height });
+  const imageData = new ImageData(new Uint8ClampedArray(data), width, height);
   ctx.putImageData(imageData, 0, 0);
   defaultImgElement.src = canvas.toDataURL();
 }
