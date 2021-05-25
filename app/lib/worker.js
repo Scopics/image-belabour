@@ -1,21 +1,25 @@
 'use strict';
 
 const path = require('path');
-
-console.log('Run worker', process.pid);
+const cachingRequire = require('./utils/cachingRequire');
+const crequire = cachingRequire();
 
 process.on('message', (message) => {
-  const { buffer, workerId, method } = message;
-
+  const { task, workerId, method } = message;
   const methodPath = path.resolve(__dirname, '../transform', `${method}.js`);
-  const transform = require(methodPath);
+  const transform = crequire(methodPath);
 
-  if (buffer.type !== 'Buffer') {
-    throw new Error('Invalid data type');
+  if (transform) {
+    try {
+      const data = new Uint8ClampedArray(task);
+      const result = transform(data);
+
+      const exportRes = Array.from(result);
+      process.send({ exportRes, workerId });
+    } catch (error) {
+      process.send({ workerId, error });
+    }
+  } else {
+    process.send({ workerId });
   }
-  const data = new Uint8ClampedArray(buffer.data);
-  const result = transform(data);
-
-  const bufferRes = Buffer.from(result);
-  process.send({ buffer: bufferRes, workerId });
 });

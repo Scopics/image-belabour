@@ -1,105 +1,69 @@
 'use strict';
 
 const http = require('http');
-const fs = require('fs');
 const path = require('path');
-const os = require('os');
+const {
+  getMethods,
+  sendError,
+  sendFile,
+  processImage,
+} = require('./server/utils');
 const processingCore = require('./app/processing-core');
+const { count, PORT } = require('./server/config');
 
-const MIME_TYPES = {
-  html: 'text/html; charset=UTF-8',
-  js: 'application/javascript; charset=UTF-8',
-  css: 'text/css',
-  png: 'image/png',
-  ico: 'image/x-icon',
-  svg: 'image/svg+xml',
-};
-
-const PORT = 8000;
-const count = os.cpus().length;
 const transformFilesPath = './app/transform/';
-const api = new Map();
-let methods;
-
-const cacheFile = (directory, name) => {
-  const filePath = path.resolve(__dirname, directory + name);
-  const method = name.split('.')[0];
-  try {
-    const func = require(filePath);
-    api.set(method, func);
-    methods = Array.from(api.keys());
-  } catch (e) {
-    api.delete(method);
-  }
-};
-
-function cacheFolder(directory) {
-  const cacheFilePath = cacheFile.bind(null, directory);
-  fs.readdir(directory, (err, files) => {
-    files.forEach(cacheFilePath);
-  });
-}
-
-async function getArgs(req) {
-  return new Promise((resolve, reject) => {
-    const chuncks = [];
-    req.on('data', (chunck) => {
-      chuncks.push(chunck);
-    });
-    req.on('end', () => {
-      const args = JSON.parse(chuncks.join(''));
-      resolve(args);
-    });
-  });
-}
-
-cacheFolder(transformFilesPath);
+const methods = new Set();
 
 const server = http.createServer(async (req, res) => {
   const url = req.url;
-  console.log(url);
-  const urlSplitted = url.slice(1).split('/');
-  const isApi = urlSplitted[0] === 'api';
+  const [urlPar1, urlPar2] = url.slice(1).split('/');
+  const isApi = urlPar1 === 'api';
   if (isApi) {
-    const urlMethod = urlSplitted[1];
-    const method = api.get(urlMethod);
-    if (!method) {
-      res.statusCode = 500;
-      res.end('Unknown method');
+    const method = urlPar2;
+    if (!methods.has(method)) {
+      sendError(res, 404, 'Not Found');
       return;
     }
-    const args = await getArgs(req);
-    const imageData = args.data;
-    const params = [imageData, count, urlMethod];
-    const processedImage = await processingCore.balancer(...params);
-    res.end(JSON.stringify(processedImage));
-  } else {
-    const isMethod = methods.includes(url.slice(1));
-    const file = isMethod ? './static/index.html' : path.join('./static', url);
-    const fileExt = path.extname(file).slice(1);
-    if (!fileExt) {
-      res.statusCode = 500;
-      res.end('Unknown method');
-      return;
-    }
-    const mimeType = MIME_TYPES[fileExt];
     try {
-      fs.readFile(file, (err, data) => {
-        if (err) {
-          res.statusCode = 500;
-          res.end('Unknown method');
-          return;
-        }
-        res.writeHead(200, { 'Content-Type': mimeType });
-        res.end(data);
-      });
+      const processedImage = await processImage(req, method);
+      const concatedImageData = [].concat(...processedImage);
+      res.end(JSON.stringify(concatedImageData));
     } catch (e) {
-      res.statusCode = 500;
-      res.end('Unknown method');
+      sendError(res);
       return;
     }
+  } else {
+    let fileExt = path.extname(url).slice(1);
+    const isFile = fileExt.length > 0;
+    const isMethod = methods.has(urlPar1);
+    if (!isFile && !isMethod) {
+      sendError(res, 404, 'Not Found');
+      return;
+    }
+
+    if (isMethod) fileExt = 'html';
+    const fileName = isMethod ? '/index.html' : url;
+    const file = path.join(__dirname, './static', fileName);
+    sendFile(res, file, fileExt);
   }
 });
 
-processingCore.runner(count);
-server.listen(PORT);
+async function startServer() {
+  try {
+    const transformFilesFullPath = path.join(__dirname, transformFilesPath);
+    getMethods(transformFilesFullPath).then((results) => {
+      results.forEach((method) => methods.add(method));
+    });
+
+    const pids = await processingCore.runner(count);
+
+    server.listen(PORT, () => {
+      console.log(`Server is listening on port ${PORT}`);
+      console.log(`The processes are running with the following pid: ${pids}`);
+    });
+  } catch (e) {
+    console.log(e.message);
+  }
+}
+
+startServer();

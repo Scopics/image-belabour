@@ -1,0 +1,64 @@
+name: Build and publish
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - v*
+
+env:
+  IMAGE_NAME: docker.pkg.github.com/scopics/image-belabour/image-belabour
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version:
+          - 14.x
+          - 16.x
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run lint --if-present
+
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version:
+          - 14.x
+          - 15.x
+          - 16.x
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm test
+
+  publish:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: [test, lint]
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Docker login
+        run: echo "${{ secrets.SCOPICS_ACESS_TOKEN }}" | docker login https://docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+      - name: Docker build & push
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 | sed 's/v//g')
+          echo version: $VERSION
+          docker build -f Dockerfile . -t $IMAGE_NAME:$VERSION
+          docker push $IMAGE_NAME:$VERSION

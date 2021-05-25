@@ -4,9 +4,9 @@
   "description": "Project for processing images by transform RGBA function with NodeJS.",
   "main": "server.js",
   "scripts": {
-    "lint": "eslint . && prettier -c \"**/*.js\" \"**/*.json\" \"**/*.md\"",
-    "fmt": "prettier --write \"**/*.js\" \"**/*.json\" \"**/*.md\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "metatests test/",
+    "lint": "eslint . && prettier -c \"**/*.js\" \"**/*.json\" \"**/*.md\" \"**/*.yml\"",
+    "fmt": "prettier --write \"**/*.js\" \"**/*.json\" \"**/*.md\" \"**/*.yml\""
   },
   "repository": {
     "type": "git",
@@ -19,19 +19,20 @@
   ],
   "author": "Scopics",
   "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "bugs": {
     "url": "https://github.com/Scopics/image-belabour/issues"
   },
   "homepage": "https://github.com/Scopics/image-belabour#readme",
-  "dependencies": {
-    "jimp": "^0.16.1"
-  },
   "devDependencies": {
     "eslint": "^7.25.0",
     "eslint-config-metarhia": "^7.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.4.0",
+    "metatests": "^0.7.2",
     "prettier": "^2.2.1"
   }
 }
