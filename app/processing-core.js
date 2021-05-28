@@ -49,13 +49,17 @@ const balancer = (data, countWorkers, method) => {
       const { exportRes, workerId, error } = message;
       finished++;
 
-      if (error) reject(error);
+      if (error) {
+        reject(error);
+        return;
+      }
       if (!exportRes) {
         reject(
           new Error(
             'No transformation function, or the transformation was not successful'
           )
         );
+        return;
       }
 
       results[workerId] = exportRes;
