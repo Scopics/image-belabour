@@ -3,7 +3,7 @@
 const brightnessTransofrm = require('./brightness');
 
 const testOptions = {
-  ajustment: 50,
+  ajustment: 40,
   pixels: 3,
 };
 
