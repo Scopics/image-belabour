@@ -2,7 +2,9 @@
 
 const path = require('path');
 
-const cachingRequire = (cacheSize = 10) => {
+const DEFAULT_CACHE_SIZE = 10;
+
+const cachingRequire = (cacheSize = DEFAULT_CACHE_SIZE) => {
   if (!Number.isInteger(cacheSize) || cacheSize <= 0) {
     throw new Error('Cache size must be positive number');
   }
