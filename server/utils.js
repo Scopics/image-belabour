@@ -26,7 +26,7 @@ const getArgs = async (req) => {
     buffers.push(chunk);
   }
   return Buffer.concat(buffers).toString();
-}
+};
 
 function sendError(res, statusCode, message) {
   res.statusCode = statusCode || 500;
