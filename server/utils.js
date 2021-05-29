@@ -20,21 +20,13 @@ const getMethods = (directory) =>
     });
   });
 
-const getArgs = (req) =>
-  new Promise((resolve, reject) => {
-    const chuncks = [];
-    try {
-      req.on('data', (chunck) => {
-        chuncks.push(chunck);
-      });
-      req.on('end', () => {
-        const args = JSON.parse(chuncks.join(''));
-        resolve(args);
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
+const getArgs = async (req) => {
+  const buffers = [];
+  for await (const chunk of req) {
+    buffers.push(chunk);
+  }
+  return Buffer.concat(buffers).toString();
+}
 
 function sendError(res, statusCode, message) {
   res.statusCode = statusCode || 500;
@@ -55,7 +47,8 @@ function sendFile(res, file, fileExt) {
 
 async function processImage(req, method) {
   const args = await getArgs(req);
-  const imageData = args.data;
+  const body = JSON.parse(args);
+  const imageData = body.data;
   const params = [imageData, count, method];
   const processedImage = processingCore.balancer(...params);
   return processedImage;
