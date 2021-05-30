@@ -7,9 +7,9 @@ const {
   sendError,
   sendFile,
   processImage,
-} = require('./server/utils');
-const processingCore = require('./app/processing-core');
-const { count, PORT } = require('./server/config');
+} = require('./server/utils.js');
+const processingCore = require('./app/processing-core.js');
+const { count, PORT } = require('./server/config.js');
 
 const transformFilesPath = './app/transform/';
 const methods = new Set();
