@@ -2,7 +2,7 @@
 
 const cp = require('child_process');
 
-const workers = new Array();
+const workers = [];
 
 const runner = (countWorkers) => {
   for (let i = 0; i < countWorkers; i++) {
