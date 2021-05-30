@@ -23,5 +23,5 @@ module.exports = (data) => {
 
     data[rIndex] = data[gIndex] = data[bIndex] = val;
   }
-  return data;
+  return Array.from(data);
 };

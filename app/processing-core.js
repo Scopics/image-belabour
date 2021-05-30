@@ -13,7 +13,9 @@ const runner = (countWorkers) => {
 };
 
 const killer = () => {
-  workers.forEach((worker) => worker.kill('SIGTERM'));
+  for (const worker of workers) {
+    worker.kill('SIGTERM');
+  }
 };
 
 const removeListeners = (workers, eventNames, listeners) => {

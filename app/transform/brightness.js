@@ -5,7 +5,7 @@ const brightnessTransofrm = (options, data) => {
   for (let i = 0; i < data.length; i++) {
     data[i] += ajustment;
   }
-  return data;
+  return Array.from(data);
 };
 
 module.exports = brightnessTransofrm;

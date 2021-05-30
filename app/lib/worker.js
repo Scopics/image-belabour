@@ -14,7 +14,7 @@ process.on('message', (message) => {
       const data = new Uint8ClampedArray(task);
       const result = transform(data);
 
-      const exportRes = Array.from(result);
+      const exportRes = result;
       process.send({ exportRes, workerId });
     } catch (error) {
       process.send({ workerId, error });
