@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const cachingRequire = require('./utils/cachingRequire');
+const cachingRequire = require('./utils/cachingRequire.js');
 const crequire = cachingRequire();
 
 process.on('message', (message) => {
