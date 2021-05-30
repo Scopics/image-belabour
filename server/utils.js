@@ -12,7 +12,7 @@ const getMethods = (directory) =>
   new Promise((resolve) => {
     fs.readdir(directory, (err, files) => {
       if (err) {
-        resolve(new Array());
+        resolve([]);
         return;
       }
       const baseNames = files.map(getBaseName);
