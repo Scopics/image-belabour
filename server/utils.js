@@ -2,9 +2,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const processingCore = require('../app/processing-core');
+const processingCore = require('../app/processing-core.js');
 const MIME_TYPES = require('./MIME_TYPES.json');
-const { count } = require('./config');
+const { count } = require('./config.js');
 
 const getBaseName = (file) => path.basename(file, '.js');
 
