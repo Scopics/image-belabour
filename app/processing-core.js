@@ -2,7 +2,7 @@
 
 const cp = require('child_process');
 
-const workers = new Array();
+const workers = [];
 
 const runner = (countWorkers) => {
   for (let i = 0; i < countWorkers; i++) {
@@ -13,7 +13,9 @@ const runner = (countWorkers) => {
 };
 
 const killer = () => {
-  workers.forEach((worker) => worker.kill('SIGTERM'));
+  for (const worker of workers) {
+    worker.kill('SIGTERM');
+  }
 };
 
 const removeListeners = (workers, eventNames, listeners) => {
@@ -49,13 +51,17 @@ const balancer = (data, countWorkers, method) => {
       const { exportRes, workerId, error } = message;
       finished++;
 
-      if (error) reject(error);
+      if (error) {
+        reject(error);
+        return;
+      }
       if (!exportRes) {
         reject(
           new Error(
             'No transformation function, or the transformation was not successful'
           )
         );
+        return;
       }
 
       results[workerId] = exportRes;

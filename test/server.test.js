@@ -13,7 +13,7 @@ metatests.test('test getMethods function', async (test) => {
   const testData = [
     {
       args: [path.join(__dirname, '../app/transform')],
-      expected: ['graysacle', 'transform-error', 'transform1', 'transform2']
+      expected: ['brightness', 'graysacle', 'transform-error', 'transform1', 'transform2']
     },
     {
       args: [path.join(__dirname, '../app/transform/unexist')],

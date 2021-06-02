@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const cachingRequire = require('./utils/cachingRequire');
+const cachingRequire = require('./utils/cachingRequire.js');
 const crequire = cachingRequire();
 
 process.on('message', (message) => {
@@ -14,7 +14,7 @@ process.on('message', (message) => {
       const data = new Uint8ClampedArray(task);
       const result = transform(data);
 
-      const exportRes = Array.from(result);
+      const exportRes = result;
       process.send({ exportRes, workerId });
     } catch (error) {
       process.send({ workerId, error });
