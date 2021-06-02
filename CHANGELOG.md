@@ -1,5 +1,13 @@
 # History Of Changes
 
+## [1.0.1][] - 23.05.2021
+
+- Add tests
+- Add a possibility to run project in docker
+- Add github automatic testing and docker publishing
+- Add cachingRequire function
+- Optimization of functions location
+
 ## [1.0.0][] - 20.05.2021
 
 - Improved code style
