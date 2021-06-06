@@ -14,8 +14,7 @@
   },
   "keywords": [
     "nodejs",
-    "native-server",
-    "sandboxes"
+    "native-server"
   ],
   "author": "Scopics",
   "license": "MIT",
