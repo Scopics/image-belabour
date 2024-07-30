@@ -15,6 +15,11 @@ const transformFilesPath = './app/transform/';
 const methods = new Set();
 
 const server = http.createServer(async (req, res) => {
+    if (path.normalize(decodeURI(req.url)) !== decodeURI(req.url)) {
+        res.statusCode = 403;
+        res.end();
+        return;
+    }
   const url = req.url;
   const [urlPar1, urlPar2] = url.slice(1).split('/');
   const isApi = urlPar1 === 'api';
